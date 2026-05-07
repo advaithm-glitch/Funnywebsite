@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fresh Fishes Kattakkada</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ocean: #07131F;
+      --teal: #0E7490;
+      --aqua: #67E8F9;
+      --coral: #FF7F5E;
+      --white: #FFFFFF;
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--ocean);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─────────────────────────────────────── */
+    #hero {
+      position: relative;
+      height: 600vh;
+    }
+
+    #hero-sticky {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 1;
+    }
+
+    #hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(7,19,31,0.3) 0%, rgba(7,19,31,0.1) 50%, rgba(7,19,31,0.7) 100%);
+      pointer-events: none;
+    }
+
+    /* Title reveal */
+    #title-reveal {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: none;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #title-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .title-main {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 1.05;
+      text-align: center;
+      color: #fff;
+      text-shadow:
+        0 0 40px rgba(103,232,249,0.6),
+        0 0 80px rgba(103,232,249,0.3),
+        0 0 120px rgba(14,116,144,0.4);
+      letter-spacing: -0.02em;
+    }
+
+    .title-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.9rem, 2vw, 1.3rem);
+      font-weight: 300;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--aqua);
+      margin-top: 1rem;
+      opacity: 0.85;
+    }
+
+    /* Particles */
+    #particles-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    #particles-canvas.active { opacity: 1; }
+
+    /* Scroll hint */
+    #scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 20;
+      opacity: 1;
+      transition: opacity 0.5s;
+    }
+    #scroll-hint.hidden { opacity: 0; pointer-events: none; }
+    .scroll-text {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, rgba(103,232,249,0.8), transparent);
+      animation: scrollDrop 1.5s ease-in-out infinite;
+    }
+    @keyframes scrollDrop {
+      0% { transform: scaleY(0); transform-origin: top; opacity: 1; }
+      50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+    }
+
+    /* ─── CAROUSEL SECTION ─────────────────────────── */
+    #carousel-section {
+      position: relative;
+      height: 400vh;
+      background: var(--ocean);
+    }
+
+    #carousel-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Underwater BG */
+    .underwater-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(14,116,144,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 20% 80%, rgba(103,232,249,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(14,116,144,0.12) 0%, transparent 60%),
+        linear-gradient(180deg, #03080F 0%, #07131F 40%, #0A1F2F 100%);
+      pointer-events: none;
+    }
+
+    /* Light rays */
+    .light-rays {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .ray {
+      position: absolute;
+      top: -20%;
+      width: 2px;
+      height: 140%;
+      background: linear-gradient(to bottom, rgba(103,232,249,0.15), transparent);
+      transform-origin: top center;
+      animation: rayFloat 8s ease-in-out infinite;
+    }
+    .ray:nth-child(1) { left: 15%; transform: rotate(8deg); animation-delay: 0s; }
+    .ray:nth-child(2) { left: 30%; transform: rotate(-5deg); animation-delay: 1.5s; width: 3px; }
+    .ray:nth-child(3) { left: 50%; transform: rotate(3deg); animation-delay: 3s; }
+    .ray:nth-child(4) { left: 65%; transform: rotate(-8deg); animation-delay: 0.8s; width: 3px; }
+    .ray:nth-child(5) { left: 80%; transform: rotate(6deg); animation-delay: 2s; }
+    @keyframes rayFloat {
+      0%, 100% { opacity: 0.3; transform: rotate(var(--r, 5deg)) skewX(0deg); }
+      50% { opacity: 0.7; transform: rotate(var(--r, 5deg)) skewX(1deg); }
+    }
+
+    /* Bubbles */
+    .bubbles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(103,232,249,0.4), rgba(14,116,144,0.1));
+      border: 1px solid rgba(103,232,249,0.2);
+      animation: bubbleRise linear infinite;
+    }
+    @keyframes bubbleRise {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+    }
+
+    /* Section label */
+    .section-label {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 2rem 0 1rem;
+    }
+    .section-label h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--white);
+      text-shadow: 0 0 30px rgba(103,232,249,0.4);
+    }
+    .section-label p {
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--aqua);
+      margin-top: 0.4rem;
+      opacity: 0.7;
+    }
+
+    /* Track */
+    #carousel-track-wrapper {
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      padding: 2rem 0;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    #carousel-track {
+      display: flex;
+      gap: 2rem;
+      padding: 0 10vw;
+      will-change: transform;
+    }
+
+    /* Cards */
+    .fish-card {
+      flex: 0 0 300px;
+      background: rgba(14, 116, 144, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(103,232,249,0.15);
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+      cursor: pointer;
+    }
+
+    .fish-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(103,232,249,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .fish-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow:
+        0 30px 60px rgba(0,0,0,0.5),
+        0 0 40px rgba(103,232,249,0.15),
+        inset 0 1px 0 rgba(103,232,249,0.2);
+    }
+
+    .card-image-wrap {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #0a2030, #0e3a50);
+    }
+
+    .card-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.2) contrast(1.05);
+      transition: transform 0.6s ease;
+    }
+    .fish-card:hover .card-image-wrap img {
+      transform: scale(1.08);
+    }
+
+    .fish-emoji-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      background: linear-gradient(135deg, #0a2030 0%, #0e3a50 50%, #0a2540 100%);
+    }
+
+    .freshness-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(14,116,144,0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(103,232,249,0.3);
+      color: var(--aqua);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      z-index: 2;
+    }
+
+    .card-body {
+      padding: 1.4rem 1.5rem 1.6rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .fish-malayalam {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+
+    .fish-english {
+      font-size: 0.78rem;
+      color: rgba(103,232,249,0.7);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 2px;
+      font-weight: 400;
+    }
+
+    .card-divider {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(to right, var(--aqua), transparent);
+      margin: 1rem 0;
+      opacity: 0.5;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .price {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .price-unit {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.4);
+      padding-bottom: 4px;
+    }
+
+    .buy-btn {
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      border-radius: 50px;
+      border: 1.5px solid rgba(103,232,249,0.4);
+      background: rgba(103,232,249,0.08);
+      color: var(--aqua);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .buy-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(103,232,249,0.2), rgba(14,116,144,0.3));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 50px;
+    }
+
+    .buy-btn:hover {
+      border-color: var(--aqua);
+      color: var(--white);
+      box-shadow: 0 0 20px rgba(103,232,249,0.3), 0 0 40px rgba(103,232,249,0.1);
+      transform: scale(1.02);
+    }
+    .buy-btn:hover::before { opacity: 1; }
+    .buy-btn span { position: relative; z-index: 1; }
+
+    /* ─── FOOTER ──────────────────────────────────── */
+    footer {
+      background: linear-gradient(to top, #020810, #07131F);
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+      border-top: 1px solid rgba(103,232,249,0.08);
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--white);
+      text-shadow: 0 0 30px rgba(103,232,249,0.4);
+      margin-bottom: 0.5rem;
+    }
+    .footer-tagline {
+      font-size: 0.8rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--aqua);
+      opacity: 0.5;
+      margin-bottom: 3rem;
+    }
+    .footer-copy {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.2);
+    }
+
+    /* ─── LOADING ────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--ocean);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s ease;
+    }
+    #loader.fade-out { opacity: 0; pointer-events: none; }
+    .loader-fish { font-size: 3rem; animation: loaderSwim 1s ease-in-out infinite alternate; }
+    @keyframes loaderSwim {
+      0% { transform: translateX(-10px) rotate(-5deg); }
+      100% { transform: translateX(10px) rotate(5deg); }
+    }
+    .loader-text {
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--aqua);
+      margin-top: 1.5rem;
+      opacity: 0.6;
+    }
+
+    /* ─── PROGRESS ──────────────────────────────── */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--teal), var(--aqua));
+      z-index: 1000;
+      width: 0%;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 10px rgba(103,232,249,0.5);
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 768px) {
+      .fish-card { flex: 0 0 250px; }
+      .card-image-wrap { height: 160px; }
+      #carousel-track { padding: 0 5vw; gap: 1.2rem; }
+      .title-main { font-size: clamp(2.2rem, 10vw, 4rem); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-fish">🐟</div>
+  <div class="loader-text">Diving deep...</div>
+</div>
+
+<!-- Progress -->
+<div id="progress-bar"></div>
+
+<!-- ═══ HERO ═══════════════════════════════════════════ -->
+<section id="hero">
+  <div id="hero-sticky">
+    <video
+      id="hero-video"
+      src="Timeline%201.mp4"
+      muted
+      playsinline
+      preload="auto"
+      webkit-playsinline
+    ></video>
+
+    <div id="hero-overlay"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Title -->
+    <div id="title-reveal">
+      <div class="title-main">Fresh Fishes<br>Kattakkada</div>
+      <div class="title-sub">From the ocean, to your plate</div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div id="scroll-hint">
+      <div class="scroll-text">Scroll to dive</div>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CAROUSEL ═══════════════════════════════════════ -->
+<section id="carousel-section">
+  <div id="carousel-sticky">
+    <div class="underwater-bg"></div>
+
+    <!-- Light rays -->
+    <div class="light-rays">
+      <div class="ray"></div>
+      <div class="ray"></div>
+      <div class="ray"></div>
+      <div class="ray"></div>
+      <div class="ray"></div>
+    </div>
+
+    <!-- Bubbles (generated via JS) -->
+    <div class="bubbles" id="bubbles"></div>
+
+    <div class="section-label">
+      <h2>Today's Catch</h2>
+      <p>Straight from Kattakkada waters</p>
+    </div>
+
+    <div id="carousel-track-wrapper">
+      <div id="carousel-track">
+
+        <!-- 1. Mathi -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🐟</div>
+            <div class="freshness-badge">✦ Super Fresh</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">മത്തി</div>
+            <div class="fish-english">Sardine · Mathi</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹120</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 2. Ayala -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🐠</div>
+            <div class="freshness-badge">✦ Super Fresh</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">അയല</div>
+            <div class="fish-english">Mackerel · Ayala</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹180</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 3. Chemmeen -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🦐</div>
+            <div class="freshness-badge">✦ Premium</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">ചെമ്മീൻ</div>
+            <div class="fish-english">Prawn · Chemmeen</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹480</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 4. Vatta -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🐡</div>
+            <div class="freshness-badge">✦ Super Fresh</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">വട്ടൻ</div>
+            <div class="fish-english">Trevally · Vatta</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹220</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 5. Netholi -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🐟</div>
+            <div class="freshness-badge">✦ Today's Catch</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">നെത്തോലി</div>
+            <div class="fish-english">Anchovy · Netholi</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹90</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 6. Karimeen -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🐟</div>
+            <div class="freshness-badge">✦ Kerala Special</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">കരിമീൻ</div>
+            <div class="fish-english">Pearl Spot · Karimeen</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹650</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 7. Tuna -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🐟</div>
+            <div class="freshness-badge">✦ Premium</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">ചൂര</div>
+            <div class="fish-english">Tuna · Choora</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹350</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+        <!-- 8. Crab -->
+        <div class="fish-card">
+          <div class="card-image-wrap">
+            <div class="fish-emoji-fallback">🦀</div>
+            <div class="freshness-badge">✦ Live Catch</div>
+          </div>
+          <div class="card-body">
+            <div class="fish-malayalam">നണ്ടൻ</div>
+            <div class="fish-english">Crab · Nandan</div>
+            <div class="card-divider"></div>
+            <div class="price-row">
+              <div class="price">₹520</div>
+              <div class="price-unit">/ kg</div>
+            </div>
+            <button class="buy-btn"><span>Buy Fresh</span></button>
+          </div>
+        </div>
+
+      </div><!-- /track -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">Fresh Fishes Kattakkada</div>
+  <div class="footer-tagline">Ocean fresh · Daily catch</div>
+  <div class="footer-copy">© 2024 Fresh Fishes Kattakkada · All rights reserved</div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   LOADER
+═══════════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('fade-out');
+    setTimeout(() => document.getElementById('loader').remove(), 900);
+  }, 1200);
+});
+
+/* ═══════════════════════════════════════════════════════
+   VIDEO SCRUB ON SCROLL
+═══════════════════════════════════════════════════════ */
+const video = document.getElementById('hero-video');
+const hero  = document.getElementById('hero');
+const titleReveal = document.getElementById('title-reveal');
+const scrollHint  = document.getElementById('scroll-hint');
+const particlesCanvas = document.getElementById('particles-canvas');
+const progressBar = document.getElementById('progress-bar');
+
+let videoDuration = 0;
+let titleShown = false;
+let videoUnlocked = false;
+let isSeeking = false;
+let pendingSeekTime = null;
+
+video.addEventListener('loadedmetadata', () => {
+  videoDuration = video.duration;
+  video.currentTime = 0;
+});
+
+// Must play+pause once to unlock seeking in all browsers
+async function unlockVideo() {
+  if (videoUnlocked) return;
+  videoUnlocked = true;
+  try {
+    video.muted = true;
+    await video.play();
+    video.pause();
+    video.currentTime = 0;
+  } catch(e) { /* blocked — scrub still works on many browsers */ }
+}
+
+// Queue-based seeking: don't pile up seeks
+function seekTo(t) {
+  if (isSeeking) {
+    pendingSeekTime = t;
+    return;
+  }
+  isSeeking = true;
+  video.currentTime = t;
+}
+
+video.addEventListener('seeked', () => {
+  isSeeking = false;
+  if (pendingSeekTime !== null) {
+    const t = pendingSeekTime;
+    pendingSeekTime = null;
+    seekTo(t);
+  }
+});
+
+// Unlock on first user gesture
+['scroll', 'touchstart', 'mousedown', 'keydown'].forEach(evt => {
+  window.addEventListener(evt, unlockVideo, { once: true, passive: true });
+});
+
+/* ═══════════════════════════════════════════════════════
+   PARTICLES
+═══════════════════════════════════════════════════════ */
+const pCtx = particlesCanvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  particlesCanvas.width  = window.innerWidth;
+  particlesCanvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnParticle() {
+  return {
+    x: Math.random() * particlesCanvas.width,
+    y: Math.random() * particlesCanvas.height,
+    r: Math.random() * 2 + 0.5,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: -(Math.random() * 0.6 + 0.2),
+    alpha: Math.random() * 0.5 + 0.2,
+    life: 1,
+  };
+}
+
+for (let i = 0; i < 80; i++) particles.push(spawnParticle());
+
+function drawParticles() {
+  pCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.003;
+    if (p.life <= 0) particles[i] = spawnParticle();
+
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    const gradient = pCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+    gradient.addColorStop(0, `rgba(103,232,249,${p.alpha * p.life})`);
+    gradient.addColorStop(1, 'transparent');
+    pCtx.fillStyle = gradient;
+    pCtx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+/* ═══════════════════════════════════════════════════════
+   BUBBLES (carousel section)
+═══════════════════════════════════════════════════════ */
+const bubblesContainer = document.getElementById('bubbles');
+for (let i = 0; i < 18; i++) {
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const size = Math.random() * 12 + 4;
+  b.style.cssText = `
+    width: ${size}px;
+    height: ${size}px;
+    left: ${Math.random() * 100}%;
+    bottom: ${Math.random() * -20}%;
+    animation-duration: ${Math.random() * 8 + 6}s;
+    animation-delay: ${Math.random() * 6}s;
+    opacity: ${Math.random() * 0.5 + 0.1};
+  `;
+  bubblesContainer.appendChild(b);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL HANDLER
+═══════════════════════════════════════════════════════ */
+const carouselSection = document.getElementById('carousel-section');
+const carouselTrack   = document.getElementById('carousel-track');
+
+function getHeroProgress() {
+  const rect = hero.getBoundingClientRect();
+  const scrolled = -rect.top;
+  const total = hero.offsetHeight - window.innerHeight;
+  return Math.max(0, Math.min(1, scrolled / total));
+}
+
+function getCarouselProgress() {
+  const rect = carouselSection.getBoundingClientRect();
+  const scrolled = -rect.top;
+  const total = carouselSection.offsetHeight - window.innerHeight;
+  return Math.max(0, Math.min(1, scrolled / total));
+}
+
+function onScroll() {
+  const heroProgress = getHeroProgress();
+
+  // Global progress bar
+  const totalScrollable = document.body.scrollHeight - window.innerHeight;
+  progressBar.style.width = (window.scrollY / totalScrollable * 100) + '%';
+
+  // Video scrub — first 85% of hero scroll
+  if (videoDuration > 0) {
+    const videoPct = Math.min(heroProgress / 0.85, 1);
+    const targetTime = videoPct * videoDuration;
+    if (Math.abs(video.currentTime - targetTime) > 0.04) {
+      seekTo(targetTime);
+    }
+  }
+
+  // Scroll hint — hide after 5% scroll
+  if (heroProgress > 0.05) {
+    scrollHint.classList.add('hidden');
+  } else {
+    scrollHint.classList.remove('hidden');
+  }
+
+  // Title reveal — after 85% of hero scroll
+  if (heroProgress >= 0.85) {
+    if (!titleShown) {
+      titleShown = true;
+      particlesCanvas.classList.add('active');
+      // Smooth CSS transition for title
+      titleReveal.style.transition = 'opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1)';
+    }
+    const revealPct = Math.min((heroProgress - 0.85) / 0.15, 1);
+    titleReveal.style.opacity = revealPct;
+    titleReveal.style.transform = `translateY(${(1 - revealPct) * 30}px)`;
+    titleReveal.style.transition = 'none'; // direct scroll control
+  } else {
+    titleShown = false;
+    titleReveal.style.opacity = 0;
+    titleReveal.style.transform = 'translateY(30px)';
+    particlesCanvas.classList.remove('active');
+  }
+
+  // Carousel horizontal scroll
+  const carouselPct = getCarouselProgress();
+  const trackWidth = carouselTrack.scrollWidth - carouselTrack.parentElement.offsetWidth;
+  const offset = carouselPct * trackWidth;
+  carouselTrack.style.transform = `translateX(-${offset}px)`;
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+/* ═══════════════════════════════════════════════════════
+   CARD TILT
+═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.fish-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top  + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width  / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    card.style.transform = `
+      translateY(-12px) scale(1.02)
+      rotateX(${-dy * 6}deg)
+      rotateY(${dx * 6}deg)
+    `;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+/* ═══════════════════════════════════════════════════════
+   BUY BUTTON RIPPLE
+═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.buy-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const rect = btn.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.cssText = `
+      position: absolute;
+      width: ${size}px; height: ${size}px;
+      border-radius: 50%;
+      background: rgba(103,232,249,0.3);
+      transform: translate(-50%,-50%) scale(0);
+      left: ${e.clientX - rect.left}px;
+      top:  ${e.clientY - rect.top}px;
+      animation: ripple 0.6s ease-out forwards;
+      pointer-events: none;
+    `;
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 700);
+  });
+});
+
+// Ripple keyframe
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes ripple {
+    to { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
